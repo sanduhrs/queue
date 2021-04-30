@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+
+use sanduhrs\Queue\Item;
+use sanduhrs\Queue\ReliablePhpRedis;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$client = new Redis();
+$client->connect($_ENV['HOST'], $_ENV['PORT']);
+
+$queue = new ReliablePhpRedis(
+    $_ENV['NAME'],
+    ['reserve_timeout' => NULL],
+    $client
+);
+
+while (TRUE) {
+    if ($item = $queue->claimItem()) {
+
+        $item = Item::createFromQueue($item);
+        echo 'Item ', $item->qid, ' claimed', PHP_EOL;
+        echo 'Processing item ';
+        for ($i = 0; $i <= rand(3, 6); $i++) {
+            echo '.';
+            $success = (bool) rand(0, 1);
+        }
+        echo PHP_EOL;
+
+        if ($success) {
+            echo 'Success, deleting item.', PHP_EOL;
+            $queue->deleteItem($item);
+        }
+        else {
+            echo 'Failure, releasing item for reprocessing.', PHP_EOL;
+            $queue->releaseItem($item);
+        }
+    }
+    else {
+        echo 'No item to claim.', PHP_EOL;
+        sleep(1);
+    }
+}

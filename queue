@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+use sanduhrs\Queue\ReliablePhpRedis;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$name = 'test';
+$host = '127.0.0.1';
+$settings = [
+    'reserve_timeout' => NULL,
+];
+
+$client = new Redis();
+$client->connect($host);
+
+$queue = new ReliablePhpRedis($name, $settings, $client);
+
+echo 'Queue name "', $name, '"', PHP_EOL;
+echo 'Number of un-, claimed items ', $queue->numberOfItems(), PHP_EOL;

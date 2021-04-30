@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+use sanduhrs\Queue\ReliablePhpRedis;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$client = new Redis();
+$client->connect($_ENV['HOST'], $_ENV['PORT']);
+
+$queue = new ReliablePhpRedis(
+    $_ENV['NAME'],
+    ['reserve_timeout' => NULL],
+    $client
+);
+
+while (TRUE) {
+    $qid = $queue->createItem(['maeh' => rand(0, 999999)]);
+    echo 'Item created with QID ', $qid, PHP_EOL;
+}

@@ -1,0 +1,15 @@
+{
+    "name": "sanduhrs/queue",
+    "authors": [
+        {
+            "name": "sanduhrs",
+            "email": "stefan@auditor.email"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "sanduhrs\\Queue\\": ["src/"] }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.3"
+    }
+}
